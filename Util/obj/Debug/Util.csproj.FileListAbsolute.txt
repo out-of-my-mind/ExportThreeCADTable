@@ -1,0 +1,24 @@
+E:\井瑞\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\Util\bin\Debug\Util.dll
+E:\井瑞\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\Util\bin\Debug\Util.pdb
+E:\井瑞\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\Util\bin\Debug\AcDbMgd.dll
+E:\井瑞\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\Util\bin\Debug\AcMgd.dll
+E:\井瑞\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\Util\bin\Debug\AdWindows.dll
+E:\井瑞\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\Util\bin\Debug\AcTcMgd.dll
+E:\井瑞\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\Util\bin\Debug\AcCui.dll
+E:\井瑞\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\Util\obj\Debug\Util.csproj.CopyComplete
+E:\井瑞\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\Util\obj\Debug\Util.dll
+E:\井瑞\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\AutoCAD二次开发 选文字到表格\Util\obj\Debug\Util.pdb
+D:\Documents\Visual Studio 2015\Projects\AutoCAD二次开发 选文字到表格\Util\bin\Debug\Util.dll
+D:\Documents\Visual Studio 2015\Projects\AutoCAD二次开发 选文字到表格\Util\bin\Debug\Util.pdb
+D:\Documents\Visual Studio 2015\Projects\AutoCAD二次开发 选文字到表格\Util\obj\Debug\Util.dll
+D:\Documents\Visual Studio 2015\Projects\AutoCAD二次开发 选文字到表格\Util\obj\Debug\Util.pdb
+D:\Documents\Visual Studio 2015\Projects\AutoCAD二次开发 选文字到表格20200509\Util\bin\Debug\Util.dll
+D:\Documents\Visual Studio 2015\Projects\AutoCAD二次开发 选文字到表格20200509\Util\bin\Debug\Util.pdb
+D:\Documents\Visual Studio 2015\Projects\AutoCAD二次开发 选文字到表格20200509\Util\obj\Debug\Util.dll
+D:\Documents\Visual Studio 2015\Projects\AutoCAD二次开发 选文字到表格20200509\Util\obj\Debug\Util.pdb
+D:\Documents\Visual Studio 2015\Projects\AutoCAD二次开发 选文字到表格20200509\Util\obj\Debug\Util.csprojResolveAssemblyReference.cache
+E:\MyOwnProject\AutoCAD二次开发 选文字到表格20200509\AutoCAD二次开发 选文字到表格20200509\Util\bin\Debug\Util.dll
+E:\MyOwnProject\AutoCAD二次开发 选文字到表格20200509\AutoCAD二次开发 选文字到表格20200509\Util\bin\Debug\Util.pdb
+E:\MyOwnProject\AutoCAD二次开发 选文字到表格20200509\AutoCAD二次开发 选文字到表格20200509\Util\obj\Debug\Util.dll
+E:\MyOwnProject\AutoCAD二次开发 选文字到表格20200509\AutoCAD二次开发 选文字到表格20200509\Util\obj\Debug\Util.pdb
+E:\MyOwnProject\AutoCAD二次开发 选文字到表格20200509\AutoCAD二次开发 选文字到表格20200509\Util\obj\Debug\Util.csprojResolveAssemblyReference.cache

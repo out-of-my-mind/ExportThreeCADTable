@@ -1,0 +1,4 @@
+E:\MyOwnProject\AutoCAD二次开发 选文字到表格20200509\AutoCAD二次开发 选文字到表格20200509\MyEntity\bin\Release\MyEntity.dll
+E:\MyOwnProject\AutoCAD二次开发 选文字到表格20200509\AutoCAD二次开发 选文字到表格20200509\MyEntity\bin\Release\MyEntity.pdb
+E:\MyOwnProject\AutoCAD二次开发 选文字到表格20200509\AutoCAD二次开发 选文字到表格20200509\MyEntity\obj\Release\MyEntity.dll
+E:\MyOwnProject\AutoCAD二次开发 选文字到表格20200509\AutoCAD二次开发 选文字到表格20200509\MyEntity\obj\Release\MyEntity.pdb
