@@ -35,3 +35,9 @@ D:\Documents\Visual Studio 2015\Projects\ExportThreeCADTable\MyEntity\bin\Debug\
 D:\Documents\Visual Studio 2015\Projects\ExportThreeCADTable\MyEntity\bin\Debug\MyEntity.pdb
 D:\Documents\Visual Studio 2015\Projects\ExportThreeCADTable\MyEntity\obj\Debug\MyEntity.dll
 D:\Documents\Visual Studio 2015\Projects\ExportThreeCADTable\MyEntity\obj\Debug\MyEntity.pdb
+D:\Learn\ExportThreeCADTable\MyEntity\bin\Debug\MyEntity.dll
+D:\Learn\ExportThreeCADTable\MyEntity\bin\Debug\MyEntity.pdb
+D:\Learn\ExportThreeCADTable\MyEntity\obj\Debug\MyEntity.csprojAssemblyReference.cache
+D:\Learn\ExportThreeCADTable\MyEntity\obj\Debug\MyEntity.csproj.CoreCompileInputs.cache
+D:\Learn\ExportThreeCADTable\MyEntity\obj\Debug\MyEntity.dll
+D:\Learn\ExportThreeCADTable\MyEntity\obj\Debug\MyEntity.pdb
