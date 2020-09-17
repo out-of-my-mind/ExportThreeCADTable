@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Collections;
+using System;
+using System.Linq;
 
 namespace Util
 {
@@ -9,6 +10,7 @@ namespace Util
     /// </summary>
     public static class ExtensionMethod
     {
+       
         //keyValue类型  <key,IList>
         public static Dictionary<TKey, TValue> add<TKey, TValue, T>(this Dictionary<TKey, TValue> source, TKey key, T value) where TValue : IList, new()
         {

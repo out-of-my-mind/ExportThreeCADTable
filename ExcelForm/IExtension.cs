@@ -12,9 +12,9 @@ using System.Text;
 
 namespace ExcelForm
 {
-
     public class IExtension : IExtensionApplication
     {
+        private static string errorLog = IExtension.GetPath() + "\\errorLog.log";
         /// <summary>
         /// 加载程序时的初始化操作
         /// </summary>
@@ -42,8 +42,13 @@ namespace ExcelForm
         {
             try
             {
-                string cuiPath = GetPath() + "\\dctable.CUIX";
-                string newCuiPath = cuiPath.Split('\\')[0] + "\\TempTableCAD\\dctable.CUIX";
+#if (cad2007 || cad2008)
+                string cuiName = "\\dctable.CUI";
+#else
+                string cuiName = "\\dctable.CUIX";
+#endif
+                string cuiPath = GetPath() + cuiName;
+                string newCuiPath = cuiPath.Split('\\')[0] + "\\TempTableCAD" + cuiName;
                 File.Delete(newCuiPath);
             }
             catch(System.Exception ex)
@@ -61,10 +66,15 @@ namespace ExcelForm
             {
                 Autodesk.AutoCAD.Interop.AcadApplication cadapp = Autodesk.AutoCAD.ApplicationServices.Application.AcadApplication as Autodesk.AutoCAD.Interop.AcadApplication;
                 var doc = cadapp.ActiveDocument;
-                string cuiPath = GetPath() + "\\dctable.CUIX";
+#if (cad2007 || cad2008 || cad2009)
+                string cuiName = "\\dctable.CUI";
+#else
+                string cuiName = "\\dctable.CUIX";
+#endif
+                string cuiPath = GetPath() + cuiName;
                 if (File.Exists(cuiPath))
                 {
-                    string newCuiPath = cuiPath.Split('\\')[0]+ "\\TempTableCAD\\dctable.CUIX";
+                    string newCuiPath = cuiPath.Split('\\')[0] + "\\TempTableCAD" + cuiName;
                     if(!Directory.Exists(Path.GetDirectoryName(newCuiPath)))
                     {
                         Directory.CreateDirectory(Path.GetDirectoryName(newCuiPath));
@@ -102,7 +112,18 @@ namespace ExcelForm
             UriBuilder uri = new UriBuilder(codeBase);
             string path = Uri.UnescapeDataString(uri.Path);
             return Path.GetDirectoryName(path);
-        }              
+        }
+
+
+        public static void ErrorLog(System.Exception ex)
+        {
+            FileStream fs = File.Open(errorLog, FileMode.Append);
+            StreamWriter sw = new StreamWriter(fs);
+            sw.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm;ss ") + ex.Message);
+            sw.WriteLine(ex.StackTrace);
+            sw.Close();
+            fs.Close();
+        }
     }
 
     public class IniFileHelper
@@ -151,6 +172,7 @@ namespace ExcelForm
             long i = GetPrivateProfileString(Section, Key, DefaultValue, temp, 255, this.strIniFilePath);
             return temp.ToString();
         }
+
     }
 }
 

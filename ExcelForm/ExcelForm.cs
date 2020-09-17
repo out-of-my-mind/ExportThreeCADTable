@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
+//using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Linq;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using System.Runtime.InteropServices;
-using acadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using winApp = System.Windows.Forms;
 using DotNetARX;
 using Util;
@@ -455,9 +454,9 @@ namespace ExcelForm
             setExcelClassValue();//设置ExcelClass类的属性
             
             //激活CAD窗口
-            SetFocus(acadApp.DocumentManager.MdiActiveDocument.Window.Handle);
+            SetFocus( Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Window.Handle);
 
-            Document doc = acadApp.DocumentManager.MdiActiveDocument;
+            Document doc =  Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
             Editor ed = doc.Editor;
             Database db = doc.Database;
             
@@ -503,7 +502,7 @@ namespace ExcelForm
                     string[] sArr = new string[table.NumColumns];
                     for (int j = 0; j < table.NumColumns; j++)
                     {
-                        string s1 = table.GetTextString(i + biaoTouRowsCount, j, 0);
+                        string s1 = table.TextString(i + biaoTouRowsCount, j, 0);
                         sArr[j] = s1;
                     }
                     dataGridView1.Rows[i].SetValues(sArr);
@@ -660,7 +659,7 @@ namespace ExcelForm
         private ObjectId createTable(Database db,string title,Point3d insertPt,bool insToPt)
         {
             ObjectId objID = ObjectId.Null;
-            using (DocumentLock doclock = acadApp.DocumentManager.MdiActiveDocument.LockDocument())
+            using (DocumentLock doclock =  Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument())
             {
                 using (Transaction trans = db.TransactionManager.StartTransaction())
                 {
@@ -704,7 +703,7 @@ namespace ExcelForm
         public static ObjectId AddTableStyle(string style)
         {
             ObjectId styleId; // 存储表格样式的Id
-            Document doc = acadApp.DocumentManager.MdiActiveDocument;
+            Document doc =  Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
             Database db = HostApplicationServices.WorkingDatabase;
             using (DocumentLock doclock = doc.LockDocument())
             {
@@ -720,7 +719,7 @@ namespace ExcelForm
                     {
                         TableStyle ts = new TableStyle(); // 新建一个表格样式
                         // 设置表格所有行的外边框的线宽为0.30mm
-                        ts.SetGridLineWeight(LineWeight.LineWeight030, (int)GridLineType.OuterGridLines, TableTools.AllRows);
+                        //ts.SetGridLineWeight(LineWeight.LineWeight030, (int)GridLineType.OuterGridLines, TableTools.AllRows);
                         // 不加粗表格表头行的底部边框
                         ts.SetGridLineWeight(LineWeight.LineWeight000, (int)GridLineType.HorizontalBottom, (int)RowType.HeaderRow);
                         // 不加粗表格数据行的顶部边框
@@ -761,7 +760,7 @@ namespace ExcelForm
             //如果表格不存在，提示绘制表格。
             if (tableId == ObjectId.Null)
             {
-                acadApp.ShowAlertDialog("请先绘制表格!");
+                 Autodesk.AutoCAD.ApplicationServices.Application.ShowAlertDialog("请先绘制表格!");
                 return;
             }
 
@@ -771,7 +770,7 @@ namespace ExcelForm
 
             autoChange = true;//自动修改表格
 
-            Document doc = acadApp.DocumentManager.MdiActiveDocument;
+            Document doc =  Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
             Database db = doc.Database;
             Editor ed = doc.Editor;
             
@@ -784,7 +783,7 @@ namespace ExcelForm
                     {
                         Table table = trans.GetObject(tableId, OpenMode.ForWrite, false) as Table;
                         //激活CAD文档
-                        SetFocus(acadApp.DocumentManager.MdiActiveDocument.Window.Handle);
+                        SetFocus( Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Window.Handle);
                         //构建选择集过滤器   
                         TypedValue[] values = { new TypedValue((int)DxfCode.Start, "*TEXT,INSERT,DIMENSION"),
                                     new TypedValue((int)DxfCode.LayoutName,"Model")
@@ -806,7 +805,7 @@ namespace ExcelForm
                             {
                                 //str in list
                                 //判断单元格是否为空，不为空是否覆盖。
-                                if (table.GetTextString(ExcelClass.selectRow + biaoTouRowsCount, ExcelClass.selectCol, 0) != "")
+                                if (table.TextString(ExcelClass.selectRow + biaoTouRowsCount, ExcelClass.selectCol, 0) != "")
                                 {
                                     DialogResult dr = MessageBox.Show("单元格不为空，是否覆盖？", "提示!", MessageBoxButtons.YesNo);
                                     if (dr != DialogResult.No)
@@ -859,7 +858,7 @@ namespace ExcelForm
                             {
                                 //str in list
                                 //判断单元格是否为空，不为空是否覆盖
-                                if (table.GetTextString(ExcelClass.selectRow + biaoTouRowsCount, ExcelClass.selectCol, 0) != "")
+                                if (!string.IsNullOrEmpty(table.TextString(ExcelClass.selectRow + biaoTouRowsCount, ExcelClass.selectCol, 0)))
                                 {
                                     DialogResult dr = MessageBox.Show("单元格不为空，是否覆盖？", "提示!", MessageBoxButtons.YesNo);
                                     if (dr != DialogResult.No)
@@ -913,12 +912,12 @@ namespace ExcelForm
                         trans.Abort();
                         if (ex.Message == "eWasErased")
                         {
-                            acadApp.ShowAlertDialog("对象已被删除，请重新插入表格!");
+                             Autodesk.AutoCAD.ApplicationServices.Application.ShowAlertDialog("对象已被删除，请重新插入表格!");
                             tableId = ObjectId.Null;
                         }
                         else
                         {
-                            acadApp.ShowAlertDialog("错误：" + ex.Message);
+                             Autodesk.AutoCAD.ApplicationServices.Application.ShowAlertDialog("错误：" + ex.Message);
                         }
                     }
                 }//trans
@@ -1004,7 +1003,7 @@ namespace ExcelForm
         {
             if (tableCount > 0)
             {
-                Document doc = acadApp.DocumentManager.MdiActiveDocument;
+                Document doc =  Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
                 Database db = doc.Database;
                 //修改表格
                 using (DocumentLock doclock = doc.LockDocument())
@@ -1028,7 +1027,7 @@ namespace ExcelForm
                             trans.Abort();
                             if (ex.Message == "eWasErased")
                             {
-                                acadApp.ShowAlertDialog("对象已被删除，请重新插入表格!");
+                                 Autodesk.AutoCAD.ApplicationServices.Application.ShowAlertDialog("对象已被删除，请重新插入表格!");
                                 tableId = ObjectId.Null;
                             }
                         }

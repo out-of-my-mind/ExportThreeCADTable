@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -8,11 +7,13 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using System.IO;
+using System.Linq;
 using NPOI.SS.UserModel;
 using NPOI.HSSF.UserModel;
 using acadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using MyEntity;
 using Util;
+using NPOI.XSSF.UserModel;
 
 [assembly: CommandClass(typeof(ExcelForm.Commands))]
 namespace ExcelForm
@@ -22,6 +23,7 @@ namespace ExcelForm
     /// </summary>
     public class Commands
     {
+        
         /// <summary>
         /// 显示定制表格窗体窗体
         /// </summary>
@@ -53,7 +55,27 @@ namespace ExcelForm
                 {//用户没有选中任何
                     return;
                 }
-                IWorkbook wb = new HSSFWorkbook();
+                IWorkbook wb = null;
+                string file = "";
+                SaveFileDialog fileDialog = new SaveFileDialog();
+                fileDialog.Filter = "所有文件(*.xls)|*.xls|所有文件(*.xlsx)|*.xlsx"; //设置要选择的文件的类型 
+                fileDialog.RestoreDirectory = true;
+                if (fileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    file = fileDialog.FileName;//返回文件的完整路径
+                    if(".xlsx".Equals(Path.GetExtension(file), StringComparison.OrdinalIgnoreCase))
+                    {
+                        wb = new XSSFWorkbook();
+                    }
+                    else
+                    {
+                        wb = new HSSFWorkbook();
+                    }
+                }
+                else
+                {
+                    return;
+                }
                 int sheetIndex = 1;
                 foreach (var item in selectResults.GetObjectIds())
                 {
@@ -61,26 +83,50 @@ namespace ExcelForm
                     {
                         continue;
                     }
-                    Entity ent = item.GetObject(OpenMode.ForRead) as Entity;
-                    if ((ent as Table) != null)
+                    Table ent = transaction.GetObject(item, OpenMode.ForRead) as Table;
+                    if (ent != null)
                     {
                         List<TableCell> tablecellList = new List<TableCell>();
                         List<MergeRange> mergeRangeList = new List<MergeRange>();
-                        Table tbl = ent as Table;
-                        for (int i = 0; i < tbl.Rows.Count; i++)
+                        Table tbl = ent;
+                        for (int i = 0; i < tbl.NumRows; i++)
                         {
-                            for (int j = 0; j < tbl.Columns.Count; j++)
+                            for (int j = 0; j < tbl.NumColumns; j++)
                             {
                                 TableCell tableCell = new TableCell();
                                 tableCell.RowIndex = i;
                                 tableCell.ColumIndex = j;
                                 string value = "";
-                                if (tbl.Cells[i, j].Value != null)
+                                if (tbl.Value(i, j) != null)
                                 {
-                                    value = tbl.Cells[i, j].GetTextString(FormatOption.IgnoreMtextFormat);
+                                    value = tbl.TextString(i, j, FormatOption.IgnoreMtextFormat);
                                 }
                                 MergeRange mergeRange = new MergeRange();
-                                CellRange cellRange = tbl.Cells[i, j].GetMergeRange();//合并的信息
+#if cad2007
+                                TableRegion cellRange = tbl.IsMergedCell(i, j);//合并的信息
+                                if (IsMergeRange(cellRange))
+                                {
+                                    tableCell.IsMergeRange = true;
+                                    if (mergeRangeList.Where(o => o.BottomRow == cellRange.LastRow && o.TopRow == cellRange.FirstRow && o.LeftColumn == cellRange.FirstColumn && o.RightColumn == cellRange.LastColumn).Count() == 0)
+                                    {
+                                        mergeRange.TopRow = cellRange.FirstRow;
+                                        mergeRange.BottomRow = cellRange.LastRow;
+                                        mergeRange.LeftColumn = cellRange.FirstColumn;
+                                        mergeRange.RightColumn = cellRange.LastColumn;
+                                        mergeRangeList.Add(mergeRange);
+                                    }
+                                    else
+                                    {
+                                        mergeRange = null;
+                                    }
+                                }
+                                else
+                                {
+                                    tableCell.IsMergeRange = false;
+                                    mergeRange = null;
+                                }
+#else
+                                CellRange cellRange = tbl.GetMergeRange(i, j);//合并的信息
                                 if (IsMergeRange(cellRange))
                                 {
                                     tableCell.IsMergeRange = true;
@@ -102,6 +148,7 @@ namespace ExcelForm
                                     tableCell.IsMergeRange = false;
                                     mergeRange = null;
                                 }
+#endif
                                 tableCell.Value = value;
                                 tableCell.MergeRange = mergeRange;
                                 tablecellList.Add(tableCell);
@@ -113,7 +160,7 @@ namespace ExcelForm
                         }
                         #region 生成文件
                         //创建表  
-                        ISheet sh = wb.CreateSheet("sheet" + sheetIndex);
+                        ISheet sh = ".xlsx".Equals(Path.GetExtension(file), StringComparison.OrdinalIgnoreCase) ? ((XSSFWorkbook)wb).CreateSheet("sheet" + sheetIndex) : ((HSSFWorkbook)wb).CreateSheet("sheet" + sheetIndex);
                         int rowindex = tablecellList.Last().RowIndex;
                         int columindex = tablecellList.Last().ColumIndex;
                         for (int i = 0; i <= rowindex; i++)
@@ -128,7 +175,14 @@ namespace ExcelForm
                         {
                             if (!(itemCell.IsMergeRange && itemCell.MergeRange == null))
                             {
-                                sh.GetRow(itemCell.RowIndex).GetCell(itemCell.ColumIndex).SetCellValue(itemCell.Value);
+                                if (".xlsx".Equals(Path.GetExtension(file), StringComparison.OrdinalIgnoreCase))
+                                {
+                                    ((XSSFCell)sh.GetRow(itemCell.RowIndex).GetCell(itemCell.ColumIndex)).SetCellValue(itemCell.Value);
+                                }
+                                else
+                                {
+                                    sh.GetRow(itemCell.RowIndex).GetCell(itemCell.ColumIndex).SetCellValue(itemCell.Value);
+                                }
                             }
                             if (itemCell.MergeRange != null
                                 && itemCell.MergeRange.TopRow >= 0
@@ -143,18 +197,26 @@ namespace ExcelForm
                         sheetIndex++;
                     }
                 }
-                SaveFileDialog fileDialog = new SaveFileDialog();
-                fileDialog.Filter = "所有文件(*.xls)|*.xls|所有文件(*.xlsx)|*.xlsx"; //设置要选择的文件的类型 
-                fileDialog.RestoreDirectory = true;
-                if (fileDialog.ShowDialog() == DialogResult.OK)
+                using (FileStream stm = System.IO.File.OpenWrite(file))
                 {
-                    string file = fileDialog.FileName;//返回文件的完整路径 
-                    using (FileStream stm = System.IO.File.OpenWrite(file))
+                    try
                     {
-                        wb.Write(stm);
+                        if (".xlsx".Equals(Path.GetExtension(file), StringComparison.OrdinalIgnoreCase))
+                        {
+                            ((XSSFWorkbook)wb).Write(stm);
+                        }
+                        else
+                        {
+                            ((HSSFWorkbook)wb).Write(stm);
+                        }
+                        stm.Close();
                     }
-                    MessageBox.Show("导出数据成功");
+                    catch(System.Exception ex)
+                    {
+                        IExtension.ErrorLog(ex);
+                    }
                 }
+                MessageBox.Show("导出数据成功");
             }
         }
         /// <summary>
@@ -197,7 +259,27 @@ namespace ExcelForm
                     return;
                 }
                 //ed.WriteMessage("\n相交内："+ selectResults.GetObjectIds().Count()+"包含内"+ entsIn.Count());
-                IWorkbook wb = new HSSFWorkbook();
+                IWorkbook wb = null;
+                string file = "";
+                SaveFileDialog fileDialog = new SaveFileDialog();
+                fileDialog.Filter = "所有文件(*.xls)|*.xls|所有文件(*.xlsx)|*.xlsx"; //设置要选择的文件的类型 
+                fileDialog.RestoreDirectory = true;
+                if (fileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    file = fileDialog.FileName;//返回文件的完整路径
+                    if (".xlsx".Equals(Path.GetExtension(file), StringComparison.OrdinalIgnoreCase))
+                    {
+                        wb = new XSSFWorkbook();
+                    }
+                    else
+                    {
+                        wb = new HSSFWorkbook();
+                    }
+                }
+                else
+                {
+                    return;
+                }
                 int sheetIndex = 1;
                 Dictionary<Point3d, List<DBText>> dbtextList = new Dictionary<Point3d, List<DBText>>();
                 Dictionary<Point3d, List<MText>> mtextList = new Dictionary<Point3d, List<MText>>();
@@ -512,7 +594,7 @@ namespace ExcelForm
                                     foreach (var itemMText2 in itemMText1.OrderBy(o => o.Key.X))
                                     {
                                         itemMText2.Value.ForEach((dbtext) => {
-                                            tableCell.Value += dbtext.Text;
+                                            tableCell.Value += dbtext.Contents;
                                         });
                                     }
                                     tableCell.Value += "\n";
@@ -559,7 +641,7 @@ namespace ExcelForm
                                     foreach (var itemMText2 in itemMText1.OrderBy(o => o.Key.X))
                                     {
                                         itemMText2.Value.ForEach((dbtext) => {
-                                            tableCell.Value += dbtext.Text;
+                                            tableCell.Value += dbtext.Contents;
                                         });
                                     }
                                     tableCell.Value += "\n";
@@ -584,7 +666,7 @@ namespace ExcelForm
                 }
                 #region 生成文件
                 //创建表  
-                ISheet sh = wb.CreateSheet("sheet" + sheetIndex);
+                ISheet sh = ".xlsx".Equals(Path.GetExtension(file), StringComparison.OrdinalIgnoreCase) ? ((XSSFWorkbook)wb).CreateSheet("sheet" + sheetIndex) : ((HSSFWorkbook)wb).CreateSheet("sheet" + sheetIndex);
                 int rowindex = tablecellList.Last().RowIndex;
                 int columindex = tablecellList.Last().ColumIndex;
                 for (int i = 0; i <= rowindex; i++)
@@ -611,18 +693,18 @@ namespace ExcelForm
                     }
                 }
 
-                SaveFileDialog fileDialog = new SaveFileDialog();
-                fileDialog.Filter = "所有文件(*.xls)|*.xls|所有文件(*.xlsx)|*.xlsx"; //设置要选择的文件的类型 
-                fileDialog.RestoreDirectory = true;
-                if (fileDialog.ShowDialog() == DialogResult.OK)
+                using (FileStream stm = System.IO.File.OpenWrite(file))
                 {
-                    string file = fileDialog.FileName;//返回文件的完整路径 
-                    using (FileStream stm = System.IO.File.OpenWrite(file))
+                    if (".xlsx".Equals(Path.GetExtension(file), StringComparison.OrdinalIgnoreCase))
                     {
-                        wb.Write(stm);
+                        ((XSSFWorkbook)wb).Write(stm);
                     }
-                    MessageBox.Show("导出数据成功");
+                    else
+                    {
+                        ((HSSFWorkbook)wb).Write(stm);
+                    }
                 }
+                MessageBox.Show("导出数据成功");
                 #endregion
 
             }
@@ -888,7 +970,7 @@ namespace ExcelForm
 
         private Line GetVerticalHorizontalLine(Line line, string type)
         {
-            double angle = line.Angle * 180 / Math.PI;
+            double angle = (line.EndPoint - line.StartPoint).GetAngleTo(Vector3d.XAxis) * 180 / Math.PI;
             if (type.Equals("H"))
             {
                 if ((angle >= -0.5 && angle <= 0.5) || (angle >= 359.5 && angle <= 360) || (angle >= 179.5 && angle <= 180.5))
@@ -935,11 +1017,12 @@ namespace ExcelForm
             }
             return null;
         }
-        private bool IsMergeRange(CellRange cr)
+#if cad2007
+        private bool IsMergeRange(TableRegion cr)
         {
             if (cr != null)
             {
-                if (cr.BottomRow == -1 && cr.TopRow == -1 && cr.RightColumn == -1 && cr.LeftColumn == -1)
+                if (cr.FirstRow == -1 && cr.LastRow == -1 && cr.FirstColumn == -1 && cr.LastColumn == -1)
                 {
                     return false;
                 }
@@ -950,7 +1033,23 @@ namespace ExcelForm
                 return false;
             }
         }
-
+#else
+        private bool IsMergeRange(CellRange cr)
+        {
+            if (cr != null)
+            {
+                if (cr.BottomRow == -1 && cr.TopRow == -1 && cr.LeftColumn == -1 && cr.RightColumn == -1)
+                {
+                    return false;
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+#endif
         public Polyline3d GetRegion(string firstMessage = "请选择区域", string secondMessage = "请选择区域")
         {
             Document doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;

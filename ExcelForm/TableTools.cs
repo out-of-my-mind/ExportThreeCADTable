@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -15,7 +14,7 @@ using System.Text.RegularExpressions;
 
 namespace Util
 {
-    /// <summary>
+    /// <summary>C:\Users\tom\Desktop\ExportThreeCADTable\ExcelForm\TableTools.cs
     /// 工具类
     /// </summary>
     public static class MyTools
@@ -308,7 +307,10 @@ namespace Util
             //列，插入、删除
             if (colNum > table.NumColumns)
             {
+#if cad2007
+#else
                 if (table.CanInsertColumn(table.NumColumns))
+#endif
                 {
                     int ksCol = table.NumColumns;
                     table.InsertColumns(table.NumColumns, colWidth, colNum - table.NumColumns);
@@ -324,7 +326,10 @@ namespace Util
             }
             if (colNum < table.NumColumns)
             {
+#if cad2007
+#else
                 if (table.CanDeleteColumns(table.NumColumns - (table.NumColumns - colNum), table.NumColumns - colNum))
+#endif
                 {
                     table.DeleteColumns(table.NumColumns - (table.NumColumns - colNum), table.NumColumns - colNum);
                 }
@@ -332,14 +337,20 @@ namespace Util
             //行，插入、删除
             if (rowNum > table.NumRows - biaoTouRowsCount)
             {
-                if (table.CanInsertRow(table.NumRows))
+#if cad2007
+#else
+                 if (table.CanInsertRow(table.NumRows))
+#endif
                 {
                     table.InsertRows(table.NumRows, rowHeight, rowNum - (table.NumRows - biaoTouRowsCount));
                 }
             }
             if (rowNum < table.NumRows - biaoTouRowsCount)
             {
-                if (table.CanDeleteRows(table.NumRows - (table.NumRows - rowNum - biaoTouRowsCount), table.NumRows - rowNum - biaoTouRowsCount))
+#if cad2007
+#else
+                 if (table.CanDeleteRows(table.NumRows - (table.NumRows - rowNum - biaoTouRowsCount), table.NumRows - rowNum - biaoTouRowsCount))
+#endif
                 {
                     table.DeleteRows(table.NumRows - (table.NumRows - rowNum - biaoTouRowsCount), table.NumRows - rowNum - biaoTouRowsCount);
                 }
