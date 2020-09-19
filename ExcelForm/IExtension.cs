@@ -42,7 +42,7 @@ namespace ExcelForm
         {
             try
             {
-#if (cad2007 || cad2008)
+#if (cad2007 || cad2008 || cad2009)
                 string cuiName = "\\dctable.CUI";
 #else
                 string cuiName = "\\dctable.CUIX";
