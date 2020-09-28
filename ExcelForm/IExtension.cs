@@ -66,6 +66,13 @@ namespace ExcelForm
             {
                 Autodesk.AutoCAD.Interop.AcadApplication cadapp = Autodesk.AutoCAD.ApplicationServices.Application.AcadApplication as Autodesk.AutoCAD.Interop.AcadApplication;
                 var doc = cadapp.ActiveDocument;
+
+                ExportTableToExcel.Login ef = new ExportTableToExcel.Login();
+                DialogResult dialogResult = Autodesk.AutoCAD.ApplicationServices.Application.ShowModalDialog(ef);
+                if (!ExportTableToExcel.Login.isSuccess)
+                {
+                    return;
+                }
 #if (cad2007 || cad2008 || cad2009)
                 string cuiName = "\\dctable.CUI";
 #else
